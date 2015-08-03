@@ -1,20 +1,30 @@
-import View             from 'famous-creative/display/View';
+//Famous Components
+const DOMElement        = Famous.domRenderables.DOMElement;
+const Rotation          = Famous.components.Rotation;
+const Node              = Famous.core.Node;
+const Opacity           = Famous.components.Opacity;
+const Curves            = Famous.transitions.Curves;
+const Position          = Famous.components.Position;
+const Scale             = Famous.components.Scale;
 
-const Curves         = FamousPlatform.transitions.Curves;
+export class Card extends Node {
+    constructor(model = {}) {
+        super();
 
-export class Card extends View {
-    constructor(node, options) {
-        super(node, options);
+        this.model = model;
+        console.log('model',model);
+        this
+            .setSizeMode('relative', 'relative')
+            .setProportionalSize(1, 1)
+            .setAlign(.5, 0)
+            .setMountPoint(.5, 0)
+            .setOrigin(.5, .5);
 
-        this.model = options.model.verse;
-        this.model.i = options.model.i;
+        this.domEl = new DOMElement(this, {
+            classes: ['card']
+        });
 
-        this.setSizeMode(0, 0);
-        this.setProportionalSize(1, 1);
-
-        this.setOrigin(.5, .5, .5);
-        this.setMountPoint(.5, 0);
-        this.setAlign(.5, 0);
+        this.rotation = new Rotation(this);
 
         this.renderFront();
         this.renderBack();
@@ -22,65 +32,69 @@ export class Card extends View {
     }
 
     renderFront() {
-        this.front = new View(this.node.addChild(), {});
-        this.front.setSizeMode(0, 0);
-        this.front.setProportionalSize(1, 1);
-        this.front.setPositionZ(50);
+        let front = new Node();
+        front
+            .setSizeMode('relative', 'relative')
+            .setProportionalSize(1, 1)
+            .setAlign(.5, 0)
+            .setMountPoint(.5, 0)
+            .setOrigin(.5, .5);
 
-        this.front.setOrigin(.5, .5, .5);
-        this.front.setMountPoint(.5, 0);
-        this.front.setAlign(.5, 0);
+        front.position = new Position(front);
 
-        this.front.createDOMElement({
+        front.domEl = new DOMElement(front, {
             properties: {
-                'border': '1px solid black',
-                'backface-visibility': 'hidden',
-                'z-index': 50,
-                'background-color': 'white',
-                'text-align': 'center',
-                'border-radius': '4px'
+                'z-index': 10,
+                'text-align': 'center'
             },
             classes: ['card-front'],
             content: `<h1>${this.model.location.book} ${this.model.location.chapter}:${this.model.location.verse.start}</h1>`
         });
+
+        this.addChild(front)
     }
 
     renderBack() {
-        this.back = new View(this.node.addChild(), {});
-        this.back.setSizeMode(0, 0);
-        this.back.setProportionalSize(1, 1);
-        this.back.setPositionZ(25);
+        let back = new Node();
+        back
+            .setSizeMode('relative', 'relative')
+            .setProportionalSize(1, 1)
+            .setAlign(.5, 0)
+            .setMountPoint(.5, 0)
+            .setOrigin(.5, .5);
 
-        this.back.setOrigin(.5, .5, .5);
-        this.back.setMountPoint(.5, 0);
-        this.back.setAlign(.5, 0);
+        back.position = new Position(back);
+        back.rotation = new Rotation(back);
+        back.rotation.setY(Math.PI);
 
-        this.back.createDOMElement({
+        back.domEl = new DOMElement(back, {
             properties: {
-                'border': '1px solid black',
-                'backface-visibility': 'hidden',
-                'z-index': 25,
-                'background-color': 'white',
-                'border-radius': '4px',
-                'padding': '25px',
-                'box-sizing': 'border-box'
+                'z-index': 9
             },
             classes: ['card-back'],
             content: `<strong>${this.model.verse}<strong>`
         });
 
-        this.back.setRotationY((Math.PI * 180) / 180);
+        this.addChild(back);
     }
 
     setEvents() {
-        this.on('mousedown', () => {
-            this.haltRotation();
-            let rotationDeg = (this.getRotationY() === 0) ? 180 : 0;
-
-            this.setRotationY(Math.PI * rotationDeg / 180, {
-                curve: Curves.inOutBack,
-                duration: 1000
-            });
-        });
+        this.addUIEvent('click');
+        this.onReceive = (event, payload) => {
+            switch(event) {
+                case 'click':
+                    this.rotation.halt();
+                    let rotationDeg = (this.rotation.getY() === 0) ? 180 : 0;
+                    this.rotation.setY(Math.PI * rotationDeg / 180, {
+                        curve: Curves.inOutBack,
+                        duration: 1500
+                    });
+                    break;
+                case 'mouseover':
+                    break;
+                case 'mouseout':
+                    break;
+            }
+        };
     }
 }

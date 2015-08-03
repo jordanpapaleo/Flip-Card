@@ -21,16 +21,19 @@ const Verses = [
         },
         "verse": "Do nothing out of rivalary or conceit, but in humility consider others as more important than you.",
         "version": "Holman Christian Standard Bible"
-    },
+    }/*,
     {
         "location": {
             "book": "Phillipians",
             "chapter": 1,
-            "verse":  27
+            "verse":  {
+                "start": 3,
+                "end": 4
+            }
         },
         "verse": "",
         "version": ""
-    }
+    }*/
 ];
 
 export default Verses;

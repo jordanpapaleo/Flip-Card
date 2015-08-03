@@ -1,40 +1,54 @@
-import View             from 'famous-creative/display/View';
-import Timeline         from 'famous-creative/animation/Timeline';
 import Verses           from './data/Verses';
 import {Card}           from './Card';
 
 //Famous Components
-const Curves         = FamousPlatform.transitions.Curves;
+const Curves            = Famous.transitions.Curves;
+const Node              = Famous.core.Node;
 
-//Physics Components
-const Gravity1D      = FamousPlatform.physics.Gravity1D;
-const Gravity3D      = FamousPlatform.physics.Gravity3D;
-const Vec3           = FamousPlatform.math.Vec3;
-const Drag           = FamousPlatform.physics.Drag;
+export class App extends Node {
+    constructor() {
+        super();
 
-export class App extends View {
-    constructor(node, options) {
-        super(node, options);
+        this
+            .setAbsoluteSize(300, 200)
+            .setSizeMode('absolute', 'absolute')
+            .setAlign(.5, .5)
+            .setMountPoint(.5, .5)
+            .setOrigin(.5, .5);
 
-        this.setAlign(.5, .5);
-        this.setMountPoint(.5, .5);
-        this.setSizeModeAbsolute();
-        this.setAbsoluteSize(300, 200);
+        this.viewed = [];
+        this.queued = [];
 
-        this.cards = [];
         Verses.forEach((verse, i) => {
-            if(i > 0) return;
-            let card = new Card(this.node.addChild(), {
-                model: { verse, i }
-            });
-
-            this.cards.push(card);
+            let card = new Card(verse);
+            this.queued.push(card);
+            this.addChild(card);
         });
+
+        this.setEvents();
+    }
+
+    setEvents() {
+        document.onkeydown = (e) => {
+            console.log('e',e);
+
+            switch(e.keyCode) {
+                case 37: //left
+                    console.log('left');
+                    break;
+                case 38: //up
+                    console.log('up');
+                    break;
+                case 39: //right
+                    console.log('right');
+                    break;
+                case 40: //down
+                    console.log('down');
+                    break;
+            }
+        };
     }
 }
 
-const rootNode  = FamousPlatform.core.Famous.createContext('body');
-let camera      = new FamousPlatform.components.Camera(rootNode);
-camera.setDepth(20000);
-
-window.app = new App(rootNode.addChild(), {});
+const scene = Famous.core.FamousEngine.createScene('#app');
+window.app  = scene.addChild(new App());
